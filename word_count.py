@@ -28,9 +28,9 @@ def remove_non_letters(line):
 	return new_line
 
 def print_in_ascending_order(freqs):
-	sorted_words = freqs.sortBy(lambda pair: pair[1])
+	sorted_words = freqs.sortBy(lambda pair: pair[1],ascending=False)
 	for atuple in sorted_words.collect():
-		word = str(atuple[0])
+		word = atuple[0]
 		freq = str(atuple[1])
 		print("word " + word + " appears " + freq)
 	return sorted_words
@@ -44,6 +44,13 @@ def count_number_of_distinct_words(all_words):
 	print("number of distinct words is " + str(number_of_words))
 	return number_of_words
 
+def print_top_n(sorted_words,n):
+	top_n = sorted_words.take(n)
+	print("Printing top " + str(n) + " words")
+	for atuple in top_n:
+		print("word " +	atuple[0] + " with frequency " + str(atuple[1]))
+	return None
+
 if __name__ == "__main__":
 	# readFile: file to read words from, target_folder: where to save results, appName: name of app
 	readFile = "/home/nkostopoulos/les_miserables.txt"
@@ -54,6 +61,7 @@ if __name__ == "__main__":
 	word_frequencies = map_reduce_to_count_word_frequency(sc,readFile)
 	sorted_words = print_in_ascending_order(word_frequencies)
 	count_number_of_distinct_words(sorted_words)
+	print_top_n(sorted_words,10)
 	save_results(sorted_words,target_folder)
 
 
