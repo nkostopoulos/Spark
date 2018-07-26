@@ -7,6 +7,7 @@ from pyspark.sql import SQLContext,Row
 def set_spark_context(appName):
 	conf = SparkConf().setAppName(appName).set("spark.hadoop.yarn.resourcemanager.address","127.0.0.1:8032")
 	sc = SparkContext(conf=conf)
+	sc.setLogLevel("WARN")
 	return sc
 
 if __name__ == "__main__":
@@ -31,10 +32,26 @@ if __name__ == "__main__":
 	flowers_df = sqlContext.createDataFrame(row_data)
 	flowers_df.registerTempTable("flowers")
 
-	#tcp_interactions = sqlContext.sql("""SELECT sepal_length FROM flowers""")
-	#tcp_interactions.show()
+	print("Show everything in the database")
+	temp = sqlContext.sql("SELECT * FROM flowers")
+	query_results_number = temp.count()
+	temp.show(query_results_number,truncate = False)
 	
-	#species with petal length greater than 3.0
-	petal_len_over_3 = sqlContext.sql("""SELECT species FROM flowers WHERE petal_length > 1.0""")
-	query_results_number = petal_len_over_3.count()
-	petal_len_over_3.show(query_results_number,truncate = False)
+	print("Sepal length and sepal width of the specie 'Iris-setosa'")
+	temp = sqlContext.sql("""SELECT sepal_length,sepal_width FROM flowers WHERE species == 'Iris-setosa'""")
+	query_results_number = temp.count()
+	temp.show(query_results_number,truncate = False)
+
+	print("Petal length and width of the specie 'Iris-virginica' sorted in ascending order based on petal length")
+	temp = sqlContext.sql("""SELECT petal_length,petal_width FROM flowers WHERE species == 'Iris-virginica' ORDER BY petal_length""")
+	query_results_number = temp.count()
+	temp.show(query_results_number,truncate = False)
+
+	print("Count the records in the table that correspond to the specie 'Iris-virginica'")
+	temp = sqlContext.sql("""SELECT COUNT(*) FROM flowers WHERE species == 'Iris-virginica'""")
+	temp.show() 
+
+	print("Find maximum petal length of each specie")
+	temp = sqlContext.sql("""SELECT species,MAX(petal_length) AS MaximumPetalLength FROM flowers GROUP BY species""")
+	query_results_number = temp.count()
+	temp.show(query_results_number,truncate = False)
