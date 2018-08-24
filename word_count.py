@@ -1,5 +1,4 @@
 import sys
-
 from pyspark import SparkContext, SparkConf
 
 def set_spark_context(appName):
@@ -8,7 +7,6 @@ def set_spark_context(appName):
 	return sc
 
 def map_reduce_to_count_word_frequency(sc,sourceFile):
-  	# read in text file and split each document into words
   	words_only_letters = sc.textFile(sourceFile)
 	words = words_only_letters.map(remove_non_letters)
 	split_words = words.flatMap(lambda line: line.split(" "))
@@ -17,8 +15,10 @@ def map_reduce_to_count_word_frequency(sc,sourceFile):
 	return wordCounts
 
 def remove_non_letters(line):
+	line = " ".join(line.split())
 	new_line = ""
 	for letter in line:
+		letter = letter.lower()
 		if letter == " ":
 			new_line = new_line + " "
 		elif letter.isalpha() == False:
