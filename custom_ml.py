@@ -6,7 +6,7 @@ from pyspark.sql import SQLContext,Row
 import pyspark.mllib
 import pyspark.mllib.regression
 from pyspark.mllib.regression import LabeledPoint
-from pyspark.mllib.regression import LogisticRegressionWithSGD
+from pyspark.mllib.regression import LinearRegressionWithSGD
 
 def set_spark_context(appName):
 	conf = SparkConf().setAppName(appName).set("spark.hadoop.yarn.resourcemanager.address","127.0.0.1:8032")
@@ -52,9 +52,14 @@ if __name__ == "__main__":
 
 	# prepare an RRD of labeled points in the format of a dictionary
 	temp = flowers_df.rdd.map(lambda line:LabeledPoint(line[0],[line[1:]]))	
-	print(temp.take(5))
 
-	trainingData,testingData = temp.randomSplit([0.8,0.2],seed=1234)
-	linearModel = LogisticRegressionWithSGD.train(trainingData,1000,0.2)
-	print(linearModel.weights)
-	print(linearModel.predict([1.5,2.0,1.2,1.4]))
+	trainingData,testingData = temp.randomSplit([0.9,0.1],seed=1435)
+	linearModel = LinearRegressionWithSGD.train(trainingData,1000,0.2)
+	print("Weights of the trained model: ",linearModel.weights)
+	
+	print("Test Data")
+	print(testingData.collect())
+	
+	print(linearModel.predict([5.1,3.5,1.4,0.2]))
+	print(linearModel.predict([5.7,2.8,4.1,1.3]))
+
