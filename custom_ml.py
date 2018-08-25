@@ -21,20 +21,18 @@ def map_species_to_numbers(specie):
 		return 2
 
 if __name__ == "__main__":
-	# read_csv: the csv to read the training data from
 	read_csv = "/home/nkostopoulos/flower2.csv"
 	appName = "demonstration of SparkSQL"
 	sc = set_spark_context(appName)
 
-	# creation of an RDD using sc
 	raw_data = sc.textFile(read_csv).cache()	
-	# drop the first line. That line contains the header
 	header = raw_data.first()
 	raw_data = raw_data.filter(lambda x:x != header)
 
 	sqlContext = SQLContext(sc)
 	
 	csv_data = raw_data.map(lambda l:l.split(","))
+	print(csv_data.collect())
 	row_data = csv_data.map(lambda p: Row(
 		sepal_length = p[0],
 		sepal_width = p[1],
@@ -43,6 +41,7 @@ if __name__ == "__main__":
 		species = int(map_species_to_numbers(p[4]))
 		)
 	)
+	print(row_data.collect())
 	flowers_df = row_data.toDF()
 
 	cols = ["species","sepal_length","sepal_width","petal_length","petal_width"]
@@ -50,7 +49,6 @@ if __name__ == "__main__":
 	flowers_df = flowers_df[cols]
 	flowers_df.show(100)
 
-	# prepare an RRD of labeled points in the format of a dictionary
 	temp = flowers_df.rdd.map(lambda line:LabeledPoint(line[0],[line[1:]]))	
 
 	trainingData,testingData = temp.randomSplit([0.9,0.1],seed=1435)

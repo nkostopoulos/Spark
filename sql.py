@@ -21,11 +21,12 @@ if __name__ == "__main__":
 	
 	csv_data = raw_data.map(lambda l:l.split(","))
 	row_data = csv_data.map(lambda p: Row(
-		sepal_length = p[0],
-		sepal_width = p[1],
-		petal_length = p[2],
-		petal_width = p[3],
-		species = p[4]
+		index = p[0],
+		sepal_length = p[1],
+		sepal_width = p[2],
+		petal_length = p[3],
+		petal_width = p[4],
+		species = p[5]
 		)
 	)
 	
